@@ -1,10 +1,10 @@
 /**
- * User: steven
+ * User: Steven
  * Email:21xsj@163.com
  * Date: 14-10-07
  * Description:
  */
-(function ($) {
+;(function ($, window, document, undefined) {
     var MultipleDatePicker = function (element, options) {
         this.element = $(element);
         this.formater = PickerUtil.parseFormat(options.format || 'yyyy-mm-dd');
@@ -16,50 +16,46 @@
         this.show_date = [];
         this.range_info = {
             book_ranges: null,
-            temp_book_ranges: null,
             unavail_ranges: null
         };
-        options.col_count = this.getRealColCount();
         this.setRangeInfo();
         this.buildContainer();
         var that = this;
         $(window).resize(function () {
             var col_count = that.getRealColCount();
-            if (col_count === options.col_count) {
+            if (col_count === $('.m-db-row:first-child .m-db-col', that.container).length) {
                 return;
             }
-            options.col_count = col_count;
             var d = that.show_date[0]['show_days'][21]['month_obj'];
             that.renderDateBoxes(d);
             that.highlightSelectedDays();
         });
-        return {
-            getSelectedDates: function () {
-                var date_str_array = [];
-                if (that.selected_result.length === 2) {
-                    date_str_array[0] = PickerUtil.formatDate(that.start_date, that.formater);
-                    date_str_array[1] = PickerUtil.formatDate(that.end_date, that.formater);
-                }
-                return date_str_array;
-            },
-            clearSelect: function () {
-                that.start_date = null;
-                that.end_date = null;
-                that.selected_result = [];
-                that.highlightSelectedDays();
-            }
-        };
     };
     MultipleDatePicker.prototype = {
         constructor: MultipleDatePicker,
+        getSelectedDates: function () {
+            var that = this;
+            var strArray = [];
+            if (that.selected_result.length === 2) {
+                strArray[0] = PickerUtil.formatDate(that.start_date, that.formater);
+                strArray[1] = PickerUtil.formatDate(that.end_date, that.formater);
+            } else if (that.selected_result.length === 1) {
+                strArray[0] = PickerUtil.formatDate(that.start_date, that.formater);
+            }
+            return strArray;
+        },
+        clearSelect: function () {
+            this.start_date = null;
+            this.end_date = null;
+            this.selected_result = [];
+            this.highlightSelectedDays();
+        },
         getRealColCount: function () {
             var count = this.options.col_count;
             var w = $(window).width();
-            if (w >= 660) {
-                count = 3;
-            } else if (w >= 480 && w < 660) {
+            if (w >= 480 && w < 660) {
                 count = 2;
-            } else {
+            } else if (w < 480) {
                 count = 1;
             }
             return count;
@@ -69,10 +65,7 @@
             var that = this;
             try {
                 that.range_info.book_ranges = str2Date(o.book_ranges);
-                that.range_info.temp_book_ranges = str2Date(o.temp_book_ranges);
                 that.range_info.unavail_ranges = str2Date(o.unavail_ranges);
-                console.log('book ranges info:' + that.range_info.book_ranges);
-                console.log('temp book ranges info:' + that.range_info.temp_book_ranges);
             }
             catch (e) {
             }
@@ -95,12 +88,10 @@
             var opt = that.options;
             var container = $(PickerUtil.container_tpl);
             container.find('.m-db-boxes').html('');
-            container.find('.tag').text(that.options.tag);
-            container.find('.tag').attr('title', that.options.tag);
             that.container = container.appendTo(that.element);
             that.renderDateBoxes(new Date());
             $('.global-nav .pre', that.container).click(function () {
-                var count = opt.row_count * opt.col_count;
+                var count = opt.row_count * that.getRealColCount();
                 var d = that.show_date[count - 1]['show_days'][21]['month_obj'];
                 d.setMonth(d.getMonth() - count * 2 + 1);
                 that.renderDateBoxes(d);
@@ -108,7 +99,7 @@
             });
             $('.global-nav .next', that.container).click(function () {
                 var d = that.show_date[0]['show_days'][21]['month_obj'];
-                d.setMonth(d.getMonth() + opt.row_count * opt.col_count);
+                d.setMonth(d.getMonth() + opt.row_count * that.getRealColCount());
                 that.renderDateBoxes(d);
                 that.highlightSelectedDays();
             });
@@ -119,12 +110,13 @@
             var boxes = that.container.find('.m-db-boxes');
             boxes.html('');
             that.show_date = [];
-            var months = PickerUtil.getMonthList(start_date, opt.step, opt.row_count * opt.col_count);
+            var colX = that.getRealColCount();
+            var months = PickerUtil.getMonthList(start_date, opt.row_count * colX);
             for (var i = 0; i < opt.row_count; i++) {
                 var row = $('<div class="m-db-row m-db-clearfix"></div>').appendTo(boxes);
-                for (var j = 0; j < opt.col_count; j++) {
-                    var seq = (i * opt.col_count + j);
-                    if (j === opt.col_count - 1) {
+                for (var j = 0; j < colX; j++) {
+                    var seq = (i * colX + j);
+                    if (j === colX - 1) {
                         row.append($('<div class="m-db-col last-db-col" mdp-col-index="' + seq + '"></div>').append(that.buildDateBox(months[seq], seq)['dom_obj']));
                     } else {
                         row.append($('<div class="m-db-col" mdp-col-index="' + seq + '"></div>').append(that.buildDateBox(months[seq], seq)['dom_obj']));
@@ -132,14 +124,6 @@
                 }
             }
             that.handlePreNav();
-            //Fix responsive issue on IE8
-            if (opt.col_count === 1) {
-                that.container.find('.tag').css('width', '150');
-                that.container.find('.tag').css('overflow', 'hidden');
-            } else {
-                that.container.find('.tag').css('width', '');
-                that.container.find('.tag').css('overflow', '');
-            }
         },
         getDateMatrix: function (date) {
             var start_d = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -195,11 +179,6 @@
                     tdObj.attr('mdp-index', (j * 7 + n));
                     var date = new Date(data['month_obj'].getFullYear(), data['month_obj'].getMonth(), data.day_num);
                     var dayNum = data.day_num;
-                    var dayStyle = getDayStyle(date);
-                    //if ((dayStyle.indexOf('begin') > -1 || dayStyle.indexOf('end') > -1) && dayNum < 10) {
-                    if (dayNum < 10) {
-                        dayNum = '&nbsp;&nbsp;' + dayNum;
-                    }
                     tdObj.html('<div class="' + getDayStyle(date) + '"><span>' + dayNum + '</span></div>');
                     if (that.selected_result) {
                         var slted_list = that.selected_result;
@@ -220,60 +199,55 @@
             that.show_date[itemIndex] = result;
             return result;
             function bindDayClick() {
-                $('.avail,.avail-vs-booked-begin,.avail-vs-temp-booked-begin,.avail-vs-not-avail-begin,' +
-                    '.booked-end-vs-avail,.temp-booked-end-vs-avail,.not-avail-end-vs-avail', item).on('click', function () {
-                        var date_obj = show_days[$(this).closest('td').attr('mdp-index')]['month_obj'];
-                        date_obj.setDate(show_days[$(this).closest('td').attr('mdp-index')]['day_num']);
-                        if (that.selected_result.length === 2) {
-                            if (PickerUtil.isSameDay(that.start_date, that.end_date) &&
-                                PickerUtil.isSameDay(that.start_date, date_obj)) {
-                                that.start_date = null;
-                                that.end_date = null;
-                                that.selected_result = [];
-                                that.highlightSelectedDays();
-                                return;
-                            }
-                            if (that.start_date.getTime() > date_obj.getTime()) {
-                                if (!isValid(new Date(date_obj), that.end_date)) {
-                                    return;
-                                }
-                                that.start_date = new Date(date_obj);
-                            } else {
-                                if (!isValid(that.start_date, new Date(date_obj))) {
-                                    return;
-                                }
-                                that.end_date = new Date(date_obj);
-                            }
-                            that.selected_result = [that.start_date, that.end_date];
+                $('.avail', item).on('click', function () {
+                    var date_obj = show_days[$(this).closest('td').attr('mdp-index')]['month_obj'];
+                    date_obj.setDate(show_days[$(this).closest('td').attr('mdp-index')]['day_num']);
+                    if (that.selected_result.length === 2) {
+                        if (PickerUtil.isSameDay(that.start_date, that.end_date) &&
+                            PickerUtil.isSameDay(that.start_date, date_obj)) {
+                            that.start_date = null;
+                            that.end_date = null;
+                            that.selected_result = [];
                             that.highlightSelectedDays();
-                            if (!PickerUtil.isSameDay(that.start_date, that.end_date)) {
-                                that.options.onRangeChanged(new Date(that.start_date), new Date(that.end_date));
-                            }
-                        } else if (that.selected_result.length === 1) {
-                            if (!isValid(that.start_date, new Date(date_obj)) || !isValid(new Date(date_obj), that.start_date)) {
-                                return;
-                            }
-                            if (PickerUtil.isSameDay(that.start_date, date_obj)) {
-                                that.start_date = null;
-                                that.selected_result = [];
-                                that.highlightSelectedDays();
-                                return;
-                            }
-                            if (that.selected_result[0].getTime() > date_obj.getTime()) {
-                                that.start_date = new Date(date_obj);
-                                that.end_date = that.selected_result[0]
-                            } else {
-                                that.end_date = new Date(date_obj)
-                            }
-                            that.selected_result = [that.start_date, that.end_date];
-                            that.highlightSelectedDays();
-                            that.options.onRangeChanged(new Date(that.start_date), new Date(that.end_date));
-                        } else {
-                            that.start_date = new Date(date_obj);
-                            that.selected_result = [that.start_date];
-                            that.highlightSelectedDays();
+                            return;
                         }
-                    });
+                        if (that.start_date.getTime() > date_obj.getTime()) {
+                            if (!isValid(new Date(date_obj), that.end_date)) {
+                                return;
+                            }
+                            that.start_date = new Date(date_obj);
+                        } else {
+                            if (!isValid(that.start_date, new Date(date_obj))) {
+                                return;
+                            }
+                            that.end_date = new Date(date_obj);
+                        }
+                        that.selected_result = [that.start_date, that.end_date];
+                        that.highlightSelectedDays();
+                    } else if (that.selected_result.length === 1) {
+                        if (!isValid(that.start_date, new Date(date_obj)) || !isValid(new Date(date_obj), that.start_date)) {
+                            return;
+                        }
+                        if (PickerUtil.isSameDay(that.start_date, date_obj)) {
+                            that.start_date = null;
+                            that.selected_result = [];
+                            that.highlightSelectedDays();
+                            return;
+                        }
+                        if (that.selected_result[0].getTime() > date_obj.getTime()) {
+                            that.start_date = new Date(date_obj);
+                            that.end_date = that.selected_result[0]
+                        } else {
+                            that.end_date = new Date(date_obj)
+                        }
+                        that.selected_result = [that.start_date, that.end_date];
+                        that.highlightSelectedDays();
+                    } else {
+                        that.start_date = new Date(date_obj);
+                        that.selected_result = [that.start_date];
+                        that.highlightSelectedDays();
+                    }
+                });
             }
 
             function getDayStyle(date) {
@@ -292,123 +266,39 @@
                     class_name = 'not-avail';
                     return class_name;
                 }
-                var tbRanges = that.range_info.temp_book_ranges;
-                for (var i = 0; i < tbRanges.length; i++) {
-                    var rangeItem = tbRanges[i];
-                    var tbs = rangeItem[0];
-                    var tbe = rangeItem[1];
-                    if (t > tbs.getTime() && t < tbe.getTime()) {
-                        return 'temp-booked';
-                    } else if (t === tbs.getTime()) {
-                        if (isAdjacent(that.range_info.book_ranges, 1)) {
-                            return 'booked-end-vs-temp-booked-begin';
-                        }
-                        if (isAdjacent(that.range_info.unavail_ranges, 1)) {
-                            return 'not-avail-end-vs-temp-booked-begin';
-                        }
-                        return 'avail-vs-temp-booked-begin';
-                    } else if (t === tbe.getTime()) {
-                        if (isAdjacent(that.range_info.book_ranges, 0)) {
-                            return 'temp-booked-end-vs-booked-begin';
-                        }
-                        if (isAdjacent(that.range_info.unavail_ranges, 0)) {
-                            return 'temp-booked-end-vs-not-avail-begin';
-                        }
-                        return 'temp-booked-end-vs-avail';
-                    }
-                }
                 var bRanges = that.range_info.book_ranges;
-                for (var i = 0; i < bRanges.length; i++) {
-                    var rangeItem = bRanges[i];
-                    var bs = rangeItem[0];
-                    var be = rangeItem[1];
-                    if (t > bs.getTime() && t < be.getTime()) {
-                        return 'booked';
-                    } else if (t === bs.getTime()) {
-                        if (isAdjacent(that.range_info.temp_book_ranges, 1)) {
-                            return 'temp-booked-end-vs-booked-begin';
+                var item = null;
+                if (bRanges) {
+                    for (var i = 0; i < bRanges.length; i++) {
+                        item = bRanges[i];
+                        var bs = item[0];
+                        var be = item[1];
+                        if (t >= bs.getTime() && t <= be.getTime()) {
+                            return 'booked';
                         }
-                        if (isAdjacent(that.range_info.unavail_ranges, 1)) {
-                            return 'not-avail-end-vs-booked-begin';
-                        }
-                        return 'avail-vs-booked-begin';
-                    } else if (t === be.getTime()) {
-                        if (isAdjacent(that.range_info.temp_book_ranges, 0)) {
-                            return 'booked-end-vs-temp-booked-begin';
-                        }
-                        if (isAdjacent(that.range_info.unavail_ranges, 0)) {
-                            return 'booked-end-vs-not-avail-begin';
-                        }
-                        return 'booked-end-vs-avail';
                     }
                 }
                 var unavailRanges = that.range_info.unavail_ranges;
-                for (var i = 0; i < unavailRanges.length; i++) {
-                    var rangeItem = unavailRanges[i];
-                    var us = rangeItem[0];
-                    var ue = rangeItem[1];
-                    if (t > us.getTime() && t < ue.getTime()) {
-                        return 'not-avail';
-                    } else if (t === us.getTime()) {
-                        if (isAdjacent(that.range_info.temp_book_ranges, 1)) {
-                            return 'temp-booked-end-vs-not-avail-begin';
+                if (unavailRanges) {
+                    for (var i = 0; i < unavailRanges.length; i++) {
+                        item = unavailRanges[i];
+                        var us = item[0];
+                        var ue = item[1];
+                        if (t >= us.getTime() && t <= ue.getTime()) {
+                            return 'not-avail';
                         }
-                        if (isAdjacent(that.range_info.book_ranges, 1)) {
-                            return 'booked-end-vs-not-avail-begin';
-                        }
-                        return 'avail-vs-not-avail-begin';
-                    } else if (t === ue.getTime()) {
-                        if (isAdjacent(that.range_info.temp_book_ranges, 0)) {
-                            return 'not-avail-end-vs-temp-booked-begin';
-                        }
-                        if (isAdjacent(that.range_info.book_ranges, 0)) {
-                            return 'not-avail-end-vs-booked-begin';
-                        }
-                        return 'not-avail-end-vs-avail';
                     }
-                }
-                if (isAdjacent(that.range_info.temp_book_ranges, 1)) {
-                    return 'temp-booked-end-vs-avail';
-                }
-                if (isAdjacent(that.range_info.book_ranges, 1)) {
-                    return 'booked-end-vs-avail';
-                }
-                if (isAdjacent(that.range_info.unavail_ranges, 1)) {
-                    return 'not-avail-end-vs-avail';
-                }
-                if (isAdjacent(that.range_info.temp_book_ranges, 0)) {
-                    return 'avail-vs-temp-booked-begin';
-                }
-                if (isAdjacent(that.range_info.book_ranges, 0)) {
-                    return 'avail-vs-booked-begin';
-                }
-                if (isAdjacent(that.range_info.unavail_ranges, 0)) {
-                    return 'avail-vs-not-avail-begin';
                 }
                 return 'avail';
-
-                function isAdjacent(ranges, index) {
-                    for (var j = 0; j < ranges.length; j++) {
-                        if (PickerUtil.isSameDay(date, ranges[j][index])) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
             }
 
             function isValid(s_d, e_d) {
-                if (!that.range_info.book_ranges && !that.range_info.temp_book_ranges) {
+                if (!that.range_info.book_ranges) {
                     return true;
                 }
                 var flag = true;
                 if (that.range_info.book_ranges) {
                     flag = isValidInRanges(s_d, e_d, that.range_info.book_ranges);
-                }
-                if (flag) {
-                    if (that.range_info.temp_book_ranges) {
-                        flag = isValidInRanges(s_d, e_d, that.range_info.temp_book_ranges);
-                    }
                 }
                 if (flag) {
                     if (that.range_info.unavail_ranges) {
@@ -441,7 +331,7 @@
         highlightSelectedDays: function () {
             var that = this;
             $('.days td div', that.container).each(function (i, o) {
-                $(o).removeClass('selected').removeClass('select-begin').removeClass('select-end');
+                $(o).removeClass('selected');
             });
             if (!that.start_date && !that.end_date) {
                 return;
@@ -459,9 +349,9 @@
                         date.setDate(d_o[dp_index]['day_num']);
                         if (that.end_date) {
                             if (PickerUtil.isSameDay(date, that.start_date)) {
-                                o1.find('div').addClass('select-end');
+                                o1.find('div').addClass('selected');
                             } else if (PickerUtil.isSameDay(date, that.end_date)) {
-                                o1.find('div').addClass('select-begin');
+                                o1.find('div').addClass('selected');
                             } else if (date.getTime() > that.start_date.getTime() && date.getTime() < that.end_date.getTime()) {
                                 o1.find('div').addClass('selected');
                             }
@@ -469,9 +359,9 @@
                             if (PickerUtil.isSameDay(date, that.start_date)) {
                                 var clazz = o1.find('div').attr('class');
                                 if (clazz.indexOf('-begin') > -1) {
-                                    o1.find('div').addClass('select-begin');
+                                    o1.find('div').addClass('selected');
                                 } else {
-                                    o1.find('div').addClass('select-end');
+                                    o1.find('div').addClass('selected');
                                 }
                             }
                         }
@@ -512,7 +402,8 @@
                 return regions['en'].months[date.getMonth()] + ' ' + date.getFullYear();
             }
         },
-        getMonthList: function (date, step, count) {
+        getMonthList: function (date, count) {
+            var step = 1;
             var result = [];
             result.push(date);
             for (var i = 0; i < count - 1; i++) {
@@ -608,7 +499,7 @@
             }
             return [
                 '<table class="date-box">',
-                '   <caption class="navigation"></caption>',
+                '    <caption class="navigation"></caption>',
                 '    <tbody>',
                 '    <tr class="week-tips">',
                 '        <td>' + r['weeks'][0] + '</td>',
@@ -625,9 +516,9 @@
         },
         container_tpl: [
             '<div class="m-dp-container">',
-            '    <div class="global-nav m-db-clearfix">',
-            '        <span class="pull-l tag"></span>',
-            '        <span class="pull-r nav-btns"><i class="pre">&lt;</i><i class="next">&gt;</i></span>',
+            '    <div class="global-nav m-db-clearfix ">',
+            '        <span class="pull-l"><i class="pre">&lt;</i></span>',
+            '        <span class="pull-r"><i class="next">&gt;</i></span>',
             '    </div>',
             '    <div class="m-db-boxes">',
             '    </div>',
@@ -636,42 +527,49 @@
 
     };
     var regions = {
-            'en': {
-                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                weeks: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-            },
-            'zh': {
-                months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-                weeks: ['日', '一', '二', '三', '四', '五', '六']
-            },
-            'fr': {
-                months: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-                    'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
-                weeks: ['D', 'L', 'M', 'M', 'J', 'V', 'S']
-            },
-            'es': {
-                months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-                    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
-                weeks: ['D', 'L', 'M', 'X', 'J', 'V', 'S']
-            }
+        'en': {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            weeks: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        },
+        'zh': {
+            months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+            weeks: ['日', '一', '二', '三', '四', '五', '六']
+        },
+        'es': {
+            months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+                'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+            weeks: ['D', 'L', 'M', 'X', 'J', 'V', 'S']
         }
-        ;
+    };
     $.fn.multiple_datepicker = function (options) {
-        options = $.extend({}, $.fn.multiple_datepicker.config, options);
-        return new MultipleDatePicker(this, options);
+        var action = null;
+        if (typeof options === 'object') {
+            options = $.extend({}, $.fn.multiple_datepicker.config, options);
+        } else {
+            action = options;
+        }
+        var ret = this;
+        this.each(function () {
+            var obj = null;
+            if (action == 'getSelect') {
+                ret = $(this).data('multiple_datepicker').getSelectedDates();
+            } else if (action == 'clearSelect') {
+                $(this).data('multiple_datepicker').clearSelect();
+            } else {
+                obj = new MultipleDatePicker(this, options);
+                $(this).data('multiple_datepicker', obj);
+            }
+
+        });
+        return ret;
     };
 
     $.fn.multiple_datepicker.config = {
         locale: 'en',
-        step: 1,
         row_count: 1,
         col_count: 3,
         format: 'yyyy-mm-dd',
         book_ranges: null,
-        temp_book_ranges: null,
-        unavail_ranges: null,
-        tag: '',
-        onRangeChanged: function (startDate, endDate) {
-        }
+        unavail_ranges: null
     };
-})(jQuery);
+})(jQuery, window, document);

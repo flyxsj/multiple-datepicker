@@ -53,13 +53,6 @@
     display: inline-block;
 }
 
-.m-dp-container .tag {
-    color: #b0b0b0;
-    font-size: 0.9em;
-    height: 24px;
-    line-height: 24px;
-}
-
 .m-dp-container .pre, .m-dp-container .next {
     background-color: #f3f3f3;
     background-image: linear-gradient(#f8f8f8, #efefef);
@@ -85,7 +78,6 @@
     float: left;
 }
 
-/**define border for component**/
 .m-dp-container .m-db-boxes .m-db-row:first-child .m-db-col {
     border-top: 1px solid #aaa;
 }
@@ -108,19 +100,16 @@
 }
 
 .m-dp-container table td div {
-    width: 14px;
-    height: 14px;
+    padding: 4px;
     cursor: default;
 }
 
-.m-dp-container .avail,
-.m-dp-container .avail-vs-booked-begin,
-.m-dp-container .avail-vs-temp-booked-begin,
-.m-dp-container .avail-vs-not-avail-begin,
-.m-dp-container .booked-end-vs-avail,
-.m-dp-container .temp-booked-end-vs-avail,
-.m-dp-container .not-avail-end-vs-avail {
+.m-dp-container .avail {
     cursor: pointer;
+}
+
+.m-dp-container .days span {
+    text-align: center;
 }
 
 .m-dp-container .days .not-avail {
@@ -131,208 +120,22 @@
     padding: 4px;
 }
 
-.m-dp-container .selected, .m-dp-container .avail {
+.m-dp-container .selected, .m-dp-container .avail, .m-dp-container .booked {
     color: #fff;
 }
 
-.m-dp-container .days .booked-begin,
-.m-dp-container .days .booked-end,
-.m-dp-container .days .temp-booked-begin,
-.m-dp-container .days .temp-booked-end,
-.m-dp-container .days .not-avail-begin,
-.m-dp-container .days .not-avail-end,
-.m-dp-container .days .avail,
-.m-dp-container .days .not-avail,
-.m-dp-container .days .booked,
-.m-dp-container .days .booked-end-vs-temp-booked-begin,
-.m-dp-container .days .not-avail-end-vs-temp-booked-begin,
-.m-dp-container .days .temp-booked-end-vs-booked-begin,
-.m-dp-container .days .temp-booked-end-vs-not-avail-begin,
-.m-dp-container .days .booked-end-vs-not-avail-begin,
-.m-dp-container .days .not-avail-end-vs-booked-begin,
-.m-dp-container .days .temp-booked,
-.m-dp-container .days .avail-vs-booked-begin,
-.m-dp-container .days .booked-end-vs-avail,
-.m-dp-container .days .avail-vs-temp-booked-begin,
-.m-dp-container .days .temp-booked-end-vs-avail,
-.m-dp-container .days .avail-vs-not-avail-begin,
-.m-dp-container .days .not-avail-end-vs-avail,
-.m-dp-container .days .selected {
-    border-style: solid;
-    border-width: 11px;
-    height: 0;
-    width: 0;
-}
-
-.m-dp-container .days .booked-begin span,
-.m-dp-container .days .booked-end span,
-.m-dp-container .days .temp-booked-begin span,
-.m-dp-container .days .temp-booked-end span,
-.m-dp-container .days .select-begin span,
-.m-dp-container .days .select-end span,
-.m-dp-container .days .not-avail-begin span,
-.m-dp-container .days .not-avail-end span,
-.m-dp-container .days .avail span,
-.m-dp-container .days .not-avail span,
-.m-dp-container .days .booked span,
-.m-dp-container .days .booked-end-vs-temp-booked-begin span,
-.m-dp-container .days .not-avail-end-vs-temp-booked-begin span,
-.m-dp-container .days .temp-booked-end-vs-booked-begin span,
-.m-dp-container .days .temp-booked-end-vs-not-avail-begin span,
-.m-dp-container .days .booked-end-vs-not-avail-begin span,
-.m-dp-container .days .not-avail-end-vs-booked-begin span,
-.m-dp-container .days .temp-booked span,
-.m-dp-container .days .avail-vs-booked-begin span,
-.m-dp-container .days .booked-end-vs-avail span,
-.m-dp-container .days .avail-vs-temp-booked-begin span,
-.m-dp-container .days .temp-booked-end-vs-avail span,
-.m-dp-container .days .avail-vs-not-avail-begin span,
-.m-dp-container .days .not-avail-end-vs-avail span,
-.m-dp-container .days .selected span {
-    text-align: center;
-    top: -8px;
-    left: -7px;
-    position: relative;
-}
-
 .m-dp-container .days .avail {
-    border-color: #0C7B44 #0C7B44 #0C7B44 #0C7B44;
+    background-color: #0C7B44;
 }
 
 .m-dp-container .days .not-avail {
-    border-color: #efefef #efefef #efefef #efefef;
+    background-color: #efefef;
 }
 
 .m-dp-container .days .booked {
-    border-color: #b50000 #b50000 #b50000 #b50000;
-}
-
-.m-dp-container .days .temp-booked {
-    border-color: #CD7900 #CD7900 #CD7900 #CD7900;
+    background-color: #b50000;
 }
 
 .m-dp-container .days .selected {
-    border-color: #0079ff #0079ff #0079ff #0079ff;
-}
-
-.m-dp-container .days .booked-begin {
-    border-color: #0C7B44 #b50000 #b50000 #0C7B44;
-}
-
-.m-dp-container .days .booked-end {
-    border-color: #b50000 #0C7B44 #0C7B44 #b50000;
-}
-
-.m-dp-container .days .booked-end {
-    border-color: #b50000 #0C7B44 #0C7B44 #b50000;
-}
-
-.m-dp-container .days .temp-booked-begin {
-    border-color: #0C7B44 #CD7900 #CD7900 #0C7B44;
-}
-
-.m-dp-container .days .temp-booked-end {
-    border-color: #CD7900 #0C7B44 #0C7B44 #CD7900;
-}
-
-.m-dp-container .days .not-avail-end {
-    border-color: #efefef #0C7B44 #0C7B44 #efefef;
-}
-
-.m-dp-container .days .not-avail-begin {
-    border-color: #0C7B44 #efefef #efefef #0C7B44;
-}
-
-.m-dp-container .days .booked-end.selected {
-    border-color: #b50000 #0079ff #0079ff #b50000;
-}
-
-.m-dp-container .days .booked-begin.selected {
-    border-color: #0079ff #b50000 #b50000 #0079ff;
-}
-
-.m-dp-container .days .temp-booked-end.selected {
-    border-color: #CD7900 #0079ff #0079ff #CD7900;
-}
-
-.m-dp-container .days .temp-booked-begin.selected {
-    border-color: #0079ff #CD7900 #CD7900 #0079ff;
-}
-
-.m-dp-container .days .select-end.selected {
-    border-color: #0079ff #0C7B44 #0C7B44 #0079ff;
-}
-
-.m-dp-container .days .select-begin.selected {
-    border-color: #0C7B44 #0079ff #0079ff #0C7B44;
-}
-
-.m-dp-container .days .booked-end-vs-temp-booked-begin {
-    border-color: #b50000 #CD7900 #CD7900 #b50000;
-}
-
-.m-dp-container .days .not-avail-end-vs-temp-booked-begin {
-    border-color: #efefef #CD7900 #CD7900 #efefef;
-}
-
-.m-dp-container .days .temp-booked-end-vs-booked-begin {
-    border-color: #CD7900 #b50000 #b50000 #CD7900;
-}
-
-.m-dp-container .days .temp-booked-end-vs-not-avail-begin {
-    border-color: #CD7900 #efefef #efefef #CD7900;
-}
-
-.m-dp-container .days .booked-end-vs-not-avail-begin {
-    border-color: #b50000 #efefef #efefef #b50000;
-}
-
-.m-dp-container .days .not-avail-end-vs-booked-begin {
-    border-color: #efefef #b50000 #b50000 #efefef;
-}
-
-.m-dp-container .days .temp-booked-end-vs-avail {
-    border-color: #b50000 #0C7B44 #0C7B44 #b50000;
-}
-
-.m-dp-container .days .avail-vs-booked-begin {
-    border-color: #0C7B44 #b50000 #b50000 #0C7B44;
-}
-
-.m-dp-container .days .booked-end-vs-avail {
-    border-color: #b50000 #0C7B44 #0C7B44 #b50000;
-}
-
-.m-dp-container .days .avail-vs-temp-booked-begin {
-    border-color: #0C7B44 #CD7900 #CD7900 #0C7B44;
-}
-
-.m-dp-container .days .temp-booked-end-vs-avail {
-    border-color: #CD7900 #0C7B44 #0C7B44 #CD7900;
-}
-
-.m-dp-container .days .avail-vs-not-avail-begin {
-    border-color: #0C7B44 #efefef #efefef #0C7B44;
-}
-
-.m-dp-container .days .not-avail-end-vs-avail {
-    border-color: #efefef #0C7B44 #0C7B44 #efefef;
-}
-
-.m-dp-container .days .select-begin {
-    border-top-color: #0079ff;
-    border-left-color: #0079ff;
-}
-
-.m-dp-container .days .select-end {
-    border-bottom-color: #0079ff;
-    border-right-color: #0079ff;
-}
-
-/**fit responsive feature of tag length**/
-@media (max-width: 490px) {
-    .m-dp-container .tag {
-        width: 150px;
-        overflow: hidden;
-    }
+    background-color: #0079ff;
 }

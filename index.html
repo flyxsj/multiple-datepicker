@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="cache-control" content="max-age=0"/>
+    <meta http-equiv="cache-control" content="no-cache"/>
+    <meta http-equiv="expires" content="0"/>
+    <meta http-equiv="pragma" content="no-cache"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, user-scalable=no, maximum-scale=1, width=device-width"/>
+    <link rel="stylesheet" href="css/multiple-datepicker.css?v=4">
+    <title>Multiple DatePicker - Test</title>
+    <style>
+        html, body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+<h3>This is a Multiple DatePicker Jquery plugin to help user select date range.</h3>
+<p>
+    NOTE:<br>
+    Green color means you can select it.Gray color means it's unavailable.Red color means it has been booked.<br>
+    You are not able to cross gray/red box when selecting.Please try to zoom in/out your browser to try responsive
+    feature.
+</p>
+
+<div id="dateRangeBox">
+</div>
+<div>
+    <button id="btnGet">Get Your Selection</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <button id="btnClear">Clear Selection</button>
+</div>
+<p class="tips">
+    Please select begin and end date
+</p>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/multiple-datepicker.js?v=4"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = d.getMonth() + 2;
+        $('#dateRangeBox').multiple_datepicker({
+            locale: 'en',   //zh,en,es are available
+            row_count: 2,
+            col_count: 3,
+            format: 'yyyy-mm-dd',
+            book_ranges: [
+                [y + '-' + m + '-23', y + '-' + m + '-24']
+            ],
+            unavail_ranges: [
+                [y + '-' + m + '-10', y + '-' + m + '-12'],
+                [y + '-' + m + '-22', y + '-' + m + '-25']
+            ]
+        });
+        $('#btnGet').click(function () {
+            var date_range = $('#dateRangeBox').multiple_datepicker('getSelect');
+            if (date_range.length > 0) {
+                $('.tips').text('You have selected : ' + date_range.join(' ~ '));
+            } else {
+                $('.tips').text('Please select begin and end date');
+            }
+        });
+        $('#btnClear').click(function () {
+            $('#dateRangeBox').multiple_datepicker('clearSelect');
+            $('.tips').text('Please select begin and end date');
+        });
+    });
+</script>
+</body>
+</html>
